@@ -4,9 +4,9 @@ using Dalamud.Plugin;
 using System.IO;
 using System.Reflection;
 using Dalamud.Interface.Windowing;
-using SamplePlugin.Windows;
+using FFXIVEureka.Windows;
 
-namespace SamplePlugin
+namespace FFXIVEureka
 {
     public sealed class Plugin : IDalamudPlugin
     {
