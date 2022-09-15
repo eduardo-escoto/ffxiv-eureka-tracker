@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <DalamudLibPath>/Users/ed/Downloads/Dalamud/</DalamudLibPath>
+    <DalamudLibPath>Z:\Users\ed\Library\Application Support\XIV on Mac\dalamud\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
   
    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
@@ -66,5 +66,9 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(OutputPath)&quot; &quot;Z:\Users\ed\Desktop\ffxiv-eureka&quot; /Y /I" />
+  </Target>
 
 </Project>
