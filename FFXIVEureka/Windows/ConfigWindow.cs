@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
@@ -9,7 +9,7 @@ public class ConfigWindow : Window, IDisposable
 {
     private Configuration Configuration;
 
-    public ConfigWindow(Plugin plugin) : base(
+    public ConfigWindow(EurekaTracker plugin) : base(
         "Eureka Config",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)

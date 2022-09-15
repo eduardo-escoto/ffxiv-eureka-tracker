@@ -1,17 +1,18 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using ImGuiScene;
-
+using Lumina.Excel.GeneratedSheets;
 namespace FFXIVEureka.Windows;
 
 public class MainWindow : Window, IDisposable
 {
     private TextureWrap GoatImage;
-    private Plugin Plugin;
+    private EurekaTracker Plugin;
+    private TerritoryType territory;
 
-    public MainWindow(Plugin plugin, TextureWrap goatImage) : base(
+    public MainWindow(EurekaTracker plugin, TextureWrap goatImage) : base(
         "My Amazing Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         this.SizeConstraints = new WindowSizeConstraints
@@ -40,6 +41,11 @@ public class MainWindow : Window, IDisposable
 
         ImGui.Spacing();
 
+        if (ImGui.Button("Get the location"))
+        {
+            this.territory = Service.Data.Excel.GetSheet<TerritoryType>().GetRow(Service.ClientState.TerritoryType);
+        }
+        ImGui.Text(this.territory != null? $"Location: {this.territory.PlaceName.Value.Name}, {this.territory.TerritoryIntendedUse}, {this.territory.Name.RawString}" : "");
         ImGui.Text("Have a goat:");
         ImGui.Indent(55);
         ImGui.Image(this.GoatImage.ImGuiHandle, new Vector2(this.GoatImage.Width, this.GoatImage.Height));

@@ -1,46 +1,41 @@
-﻿using Dalamud.Game.Command;
+using Dalamud.Game.Command;
 using Dalamud.Game.ClientState;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Logging;
 using System.IO;
 using System.Reflection;
+using Lumina.Excel.GeneratedSheets;
 using Dalamud.Interface.Windowing;
 using FFXIVEureka.Windows;
 
 namespace FFXIVEureka
 {
-    public sealed class Plugin : IDalamudPlugin
+    public class EurekaTracker : IDalamudPlugin
     {
-
-        // var territory = Service.Data.Excel.GetSheet<TerritoryType>().GetRow(Service.ClientState.TerritoryType);
-        // var name = Service.Data.Excel.GetSheet<PlaceName>().GetRow(territory.PlaceName).Name;
-
         public string Name => "FFXIV Eureka";
         private const string CommandName = "/eurekatrack";
         private DalamudPluginInterface PluginInterface { get; init; }
-        private CommandManager CommandManager { get; init; }
-
-        private ClientState cstate {get; init; }
+        public static EurekaTracker Plugin { get; private set; }
 
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("SamplePlugin");
         
         
 
-        public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager)
+        public EurekaTracker(DalamudPluginInterface pluginInterface)
         {
+            pluginInterface.Create<Service>();
+            //FFXIVClientStructs.Resolver.Initialize(Service.SigScanner.SearchBase);
+
+            Plugin = this;
+
             this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
 
-        
-            // PluginLog.Log(ClientState.TerritoryType.get());
-            
+
             // you might normally want to embed resources and load them from the manifest stream
             var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
             var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
@@ -48,21 +43,23 @@ namespace FFXIVEureka
             WindowSystem.AddWindow(new ConfigWindow(this));
             WindowSystem.AddWindow(new MainWindow(this, goatImage));
 
-            this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+            Service.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "A useful message to display in /xlhelp"
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-            // ClientState.equals();
-            // PluginLog.Log(ClientState.TerritoryType, new string[] {});
+
+            var territory = Service.Data.Excel.GetSheet<TerritoryType>().GetRow(Service.ClientState.TerritoryType);
+            //var name = Service.Data.Excel.GetSheet<PlaceName>().GetRow(territory.PlaceName.Row).Name;
+            PluginLog.Log($"You are in territory: {territory.PlaceName.Value.Name}, {territory.PlaceNameRegion.Value.Name}, {territory.TerritoryIntendedUse}");
         }
 
         public void Dispose()
         {
             this.WindowSystem.RemoveAllWindows();
-            this.CommandManager.RemoveHandler(CommandName);
+            Service.Commands.RemoveHandler(CommandName);
         }
 
         private void OnCommand(string command, string args)
